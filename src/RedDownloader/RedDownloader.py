@@ -278,6 +278,25 @@ class Download:
                     f"Video file not avaliable at {qualityTypes[quality]}p going to next resolution"
                 )
                 continue
+            
+        if not wasDownloadSuccessful:
+            if self.destination is not None:
+                try:
+                    urllib.request.urlretrieve(
+                        url + f"/CMAF_720.mp4", self.destination + "Video.mp4"
+                    )
+                    wasDownloadSuccessful = True
+                    self.Logger.LogInfo("Video File Downloaded Successfully")
+                except BaseException:
+                    pass
+            else:
+                try:
+                    urllib.request.urlretrieve(url + f"/CMAF_720.mp4", "Video.mp4")
+                    wasDownloadSuccessful = True
+                    self.Logger.LogInfo("Video File Downloaded Successfully")
+                except BaseException:
+                    pass
+
         if not wasDownloadSuccessful:
             raise Exception("Can't fetch the video file")
 
@@ -286,7 +305,9 @@ class Download:
         audio_urls = [
             url + "/DASH_AUDIO_128.mp4",
             url + "/DASH_AUDIO_64.mp4",
-            url + "/DASH_audio.mp4"
+            url + "/DASH_audio.mp4",
+            url + "/CMAF_AUDIO_128.mp4",
+            url + "/CMAF_AUDIO_64.mp4"
         ]
 
         for audio_url in audio_urls:

@@ -255,50 +255,38 @@ class Download:
         if self.destination is not None:
             self.destination = self.destination + "/"
 
+        format = "CMAF"
+        formats = ["DASH", "CMAF"]
+        formatIndex = formats.index(format)
         qualityTypes = [144, 240, 360, 480, 720, 1080]
         listIndex = qualityTypes.index(quality)
         wasDownloadSuccessful = False
         for quality in range(listIndex, -1, -1):
-            self.Logger.LogInfo(f"Trying resolution: {qualityTypes[quality]}p")
-            try:
-                if self.destination is not None:
-                    urllib.request.urlretrieve(
-                        url + f"/DASH_{qualityTypes[quality]}.mp4",
-                        self.destination + "Video.mp4",
-                    )
-                    wasDownloadSuccessful = True
-                    self.Logger.LogInfo("Video File Downloaded Successfully")
-                else:
-                    urllib.request.urlretrieve(
-                        url + f"/DASH_{qualityTypes[quality]}.mp4", "Video.mp4"
-                    )
-                    wasDownloadSuccessful = True
-                    self.Logger.LogInfo("Video File Downloaded Successfully")
+            if wasDownloadSuccessful:
                 break
-            except BaseException as e:
-                self.Logger.LogInfo(e)
-                self.Logger.LogInfo(
-                    f"Video file not avaliable at {qualityTypes[quality]}p going to next resolution"
-                )
-                continue
-            
-        if not wasDownloadSuccessful:
-            if self.destination is not None:
+            for format in range(formatIndex, -1, -1):
+                self.Logger.LogInfo(f"Trying resolution: {formats[format]} {qualityTypes[quality]}p")
                 try:
-                    urllib.request.urlretrieve(
-                        url + f"/CMAF_720.mp4", self.destination + "Video.mp4"
+                    if self.destination is not None:
+                        urllib.request.urlretrieve(
+                            url + f"/{formats[format]}_{qualityTypes[quality]}.mp4",
+                            self.destination + "Video.mp4",
+                            )
+                        wasDownloadSuccessful = True
+                        self.Logger.LogInfo("Video File Downloaded Successfully")
+                    else:
+                        urllib.request.urlretrieve(
+                            url + f"/{formats[format]}_{qualityTypes[quality]}.mp4", "Video.mp4"
+                        )
+                        wasDownloadSuccessful = True
+                        self.Logger.LogInfo("Video File Downloaded Successfully")
+                    break
+                except BaseException as e:
+                    self.Logger.LogInfo(e)
+                    self.Logger.LogInfo(
+                        f"Video file not avaliable at {formats[format]} {qualityTypes[quality]}p going to next resolution"
                     )
-                    wasDownloadSuccessful = True
-                    self.Logger.LogInfo("Video File Downloaded Successfully")
-                except BaseException:
-                    pass
-            else:
-                try:
-                    urllib.request.urlretrieve(url + f"/CMAF_720.mp4", "Video.mp4")
-                    wasDownloadSuccessful = True
-                    self.Logger.LogInfo("Video File Downloaded Successfully")
-                except BaseException:
-                    pass
+                    continue
 
         if not wasDownloadSuccessful:
             raise Exception("Can't fetch the video file")

@@ -308,7 +308,8 @@ class Download:
             url + "/DASH_AUDIO_64.mp4",
             url + "/DASH_audio.mp4",
             url + "/CMAF_AUDIO_128.mp4",
-            url + "/CMAF_AUDIO_64.mp4"
+            url + "/CMAF_AUDIO_64.mp4",
+            url + "/CMAF_AUDIO.mp4"
         ]
 
         for audio_url in audio_urls:

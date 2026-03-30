@@ -258,7 +258,7 @@ class Download:
         format = "CMAF"
         formats = ["DASH", "CMAF"]
         formatIndex = formats.index(format)
-        qualityTypes = [144, 240, 360, 480, 720, 1080]
+        qualityTypes = [144, 240, 360, 480, 720, 1080, 1440, 2160]
         listIndex = qualityTypes.index(quality)
         wasDownloadSuccessful = False
         for quality in range(listIndex, -1, -1):

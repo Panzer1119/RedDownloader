@@ -252,6 +252,8 @@ class Download:
     # Getting the Audioless Video only file of a specified resolution from
     # Reddit
     def fetchVideo(self, quality, url):
+        if self.destination is not None:
+            self.destination = self.destination + "/"
 
         qualityTypes = [144, 240, 360, 480, 720, 1080]
         listIndex = qualityTypes.index(quality)

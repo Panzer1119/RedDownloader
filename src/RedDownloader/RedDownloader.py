@@ -13,6 +13,7 @@ import logging
 
 # External Imports | Required Packages
 from moviepy import *
+import moviepy.editor
 import requests
 from pytube import YouTube
 
@@ -347,9 +348,9 @@ class Download:
                 else self.output + ".mp4"
             )
 
-            with VideoFileClip(video_path) as clip:
-                with AudioFileClip(audio_path) as audioclip:
-                    new_audioclip = CompositeAudioClip([audioclip])
+            with moviepy.editor.VideoFileClip(video_path) as clip:
+                with moviepy.editor.AudioFileClip(audio_path) as audioclip:
+                    new_audioclip = moviepy.editor.CompositeAudioClip([audioclip])
                     clip.audio = new_audioclip
                     clip.write_videofile(output_path)
 

@@ -96,18 +96,18 @@ class Download:
     """
 
     def __init__(
-        self, url, quality=1080, output="downloaded", destination=None, verbose=True
+        self, url, quality=2160, output="downloaded", destination=None, verbose=True
     ):
         self.output = output
         self.MainURL = url
         self.destination = destination
-        qualityTypes = [144, 240, 360, 480, 720, 1080]
+        qualityTypes = [144, 240, 360, 480, 720, 1080, 1440, 2160]
         self.verbose = verbose
         self.Logger = Logger(self.verbose)
         if quality not in qualityTypes:  # if quality is not in the list
             raise Exception(
                 "Error: Unkown Quality Type"
-                + f" {quality} choose either 144, 240, 360, 480, 720 or 1080"  # Throw an error
+                + f" {quality} choose either 144, 240, 360, 480, 720, 1080, 1440, or 2160"  # Throw an error
             )
         else:
             # Getting the absolute reddit post link

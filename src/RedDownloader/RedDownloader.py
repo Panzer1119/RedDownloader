@@ -216,6 +216,11 @@ class Download:
                     "Support for imgur album posts has not yet been added"
                 )
 
+            elif "redgifs.com" in self.postLink:
+                self.Logger.LogInfo("Detected Post Type: RedGIFS")
+                #self.mediaType = "redgifs"
+                self.Logger.LogInfo("Support for redgifs posts has not yet been added")
+
             else:
                 self.Logger.LogInfo("Error: Could Not Recognize Post Type")
 

@@ -272,6 +272,31 @@ class Download:
                 finally:
                     api.close()
 
+            elif "/u/" in url:  # if the post is a user post
+                self.Logger.LogInfo("Checking Post Type: User Gallery")
+                # Fetching urls of all media in the post
+                self.GalleryPosts = requests.get(
+                    "https://jackhammer.pythonanywhere.com/reddit/media/gallery",
+                    params={"url": url},
+                )
+                posts = json.loads(self.GalleryPosts.content)
+                # Check if posts contains elements
+                if len(posts) == 0:
+                    self.Logger.LogInfo("No user gallery posts found")
+                else:
+                    self.mediaType = "g"
+                    if self.destination == None:
+                        self.directory = self.output
+                    else:
+                        self.directory = os.path.join(self.destination, self.output)
+                    try:
+                        # making a directory for the gallery
+                        os.mkdir(self.directory)
+                    except BaseException:
+                        pass
+                    self.Logger.LogInfo("Fetching images from user gallery")
+                    self.GetGallery(posts)
+
 
             else:
                 self.Logger.LogInfo("Error: Could Not Recognize Post Type")

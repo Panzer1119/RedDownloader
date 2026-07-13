@@ -10,6 +10,7 @@ import json
 import os
 import shutil
 import logging
+import re
 
 # External Imports | Required Packages
 from moviepy import *
@@ -18,6 +19,17 @@ import requests
 from pytube import YouTube
 import redgifs
 from redgifs.models import GIF, URL
+
+
+_REDGIFS_ID_RE = re.compile(
+    r"^https?://(?:i\.)?redgifs\.com/(?:watch/|i/)(?P<id>[a-zA-Z0-9_-]+)(?:\.[a-zA-Z0-9]+)?/?(?:\?.*)?$"
+)
+
+def extract_redgifs_id(url: str) -> str:
+    match = _REDGIFS_ID_RE.match(url)
+    if not match:
+        raise ValueError(f"Not a valid RedGIFS URL: {url}")
+    return match.group("id")
 
 
 class Logger:
@@ -220,14 +232,17 @@ class Download:
                 )
 
             elif "redgifs.com" in self.postLink:
-                self.Logger.LogInfo("Detected Post Type: RedGIFS")
+                if "i.redgifs.com" in self.postLink:
+                    self.Logger.LogInfo("Detected Post Type: RedGIFS image")
+                else:
+                    self.Logger.LogInfo("Detected Post Type: RedGIFS gif?")
                 self.mediaType = "redgifs"
                 api = redgifs.API()
 
                 try:
                     self.Logger.LogInfo("Downloading RedGIFS post")
                     api.login() # Login with temporary token
-                    redgifs_id: str = self.postLink.split("/")[-1] #TODO Use proper RegEx for this?
+                    redgifs_id: str = extract_redgifs_id(self.postLink)
                     gif: GIF = api.get_gif(id=redgifs_id)
                     if gif is None:
                         self.Logger.LogWarning(f"Failed to fetch RedGIFS post with id '{redgifs_id}', please check the URL/ID and try again.")

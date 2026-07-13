@@ -21,15 +21,18 @@ import redgifs
 from redgifs.models import GIF, URL
 
 
-_REDGIFS_ID_RE = re.compile(
-    r"^https?://(?:i\.)?redgifs\.com/(?:watch/|i/)(?P<id>[a-zA-Z0-9_-]+)(?:\.[a-zA-Z0-9]+)?/?(?:\?.*)?$"
+_REDGIFS_RE = re.compile(
+    r"^https?://(?:i\.)?redgifs\.com/(?:watch/|i/)"
+    r"(?P<id>[a-zA-Z0-9_-]+)"
+    r"(?:\.(?P<extension>[a-zA-Z0-9]+))?"
+    r"/?(?:\?.*)?$"
 )
 
-def extract_redgifs_id(url: str) -> str:
-    match = _REDGIFS_ID_RE.match(url)
+def extract_redgifs_info(url: str) -> tuple[str, str | None]:
+    match = _REDGIFS_RE.match(url)
     if not match:
         raise ValueError(f"Not a valid RedGIFS URL: {url}")
-    return match.group("id")
+    return match.group("id"), match.group("extension")
 
 
 class Logger:
@@ -242,7 +245,9 @@ class Download:
                 try:
                     self.Logger.LogInfo("Downloading RedGIFS post")
                     api.login() # Login with temporary token
-                    redgifs_id: str = extract_redgifs_id(self.postLink)
+                    redgifs_id, redgifs_ext = extract_redgifs_info(self.postLink)
+                    if redgifs_ext is None or redgifs_ext == "":
+                        redgifs_ext = "mp4"
                     gif: GIF = api.get_gif(id=redgifs_id)
                     if gif is None:
                         self.Logger.LogWarning(f"Failed to fetch RedGIFS post with id '{redgifs_id}', please check the URL/ID and try again.")
@@ -254,10 +259,11 @@ class Download:
                     else:
                         url = urls.hd
                     self.Logger.LogInfo(f"Downloading RedGIFS post with id '{redgifs_id}' from URL: {url}")
-                    api.download(url, f"{self.output}" + ".mp4")
+                    file_path: str = f"{self.output}.{redgifs_ext}"
+                    api.download(url, file_path)
                     self.Logger.LogInfo("Sucessfully downloaded RedGIFS post: " + f"{self.output}")
                     if self.destination is not None:
-                        shutil.move(f"{self.output}.mp4", self.destination)
+                        shutil.move(file_path, self.destination)
 
                 except Exception as e:
                     self.Logger.LogInfo("Failed to download RedGIFS post")

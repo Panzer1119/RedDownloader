@@ -16,6 +16,9 @@ from moviepy import *
 import moviepy.editor
 import requests
 from pytube import YouTube
+import redgifs
+from redgifs.models import GIF, URL
+
 
 class Logger:
 
@@ -218,8 +221,36 @@ class Download:
 
             elif "redgifs.com" in self.postLink:
                 self.Logger.LogInfo("Detected Post Type: RedGIFS")
-                #self.mediaType = "redgifs"
-                self.Logger.LogInfo("Support for redgifs posts has not yet been added")
+                self.mediaType = "redgifs"
+                api = redgifs.API()
+
+                try:
+                    self.Logger.LogInfo("Downloading RedGIFS post")
+                    api.login() # Login with temporary token
+                    redgifs_id: str = self.postLink.split("/")[-1] #TODO Use proper RegEx for this?
+                    gif: GIF = api.get_gif(id=redgifs_id)
+                    if gif is None:
+                        self.Logger.LogWarning(f"Failed to fetch RedGIFS post with id '{redgifs_id}', please check the URL/ID and try again.")
+                        return
+                    urls: URL = gif.urls
+                    if urls.hd is None or urls.hd == "":
+                        url = urls.sd
+                        self.Logger.LogWarning("HD URL not found, falling back to SD URL.")
+                    else:
+                        url = urls.hd
+                    self.Logger.LogInfo(f"Downloading RedGIFS post with id '{redgifs_id}' from URL: {url}")
+                    api.download(url, f"{self.output}" + ".mp4")
+                    self.Logger.LogInfo("Sucessfully downloaded RedGIFS post: " + f"{self.output}")
+                    if self.destination is not None:
+                        shutil.move(f"{self.output}.mp4", self.destination)
+
+                except Exception as e:
+                    self.Logger.LogInfo("Failed to download RedGIFS post")
+                    self.Logger.LogInfo(e)
+
+                finally:
+                    api.close()
+
 
             else:
                 self.Logger.LogInfo("Error: Could Not Recognize Post Type")

@@ -22,7 +22,7 @@ from redgifs.models import GIF, URL
 
 
 _REDGIFS_RE = re.compile(
-    r"^https?://(?:i\.|www\.)?redgifs\.com/(?:watch/|i/)"
+    r"^https?://(?:i\.|www\.)?redgifs\.com/(?:watch/|i/|ifr/)"
     r"(?P<id>[a-zA-Z0-9_-]+)"
     r"(?:\.(?P<extension>[a-zA-Z0-9]+))?"
     r"/?(?:\?.*)?$"
